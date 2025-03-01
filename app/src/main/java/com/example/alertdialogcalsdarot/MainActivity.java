@@ -23,7 +23,6 @@ import androidx.core.view.WindowInsetsCompat;
 import java.text.DecimalFormat;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
-
     boolean handasitOrHeshbonit;
     ListView listView;
     String[] strLV = new String[20];
@@ -53,6 +52,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         tVSn = (TextView) findViewById(R.id.tVSn);
         listView = (ListView) findViewById(R.id.listView);
         getData = (Button) findViewById(R.id.getData);
+
+        tVX1.setVisibility(View.INVISIBLE);
+        tVd.setVisibility(View.INVISIBLE);
+        tVn.setVisibility(View.INVISIBLE);
+        tVSn.setVisibility(View.INVISIBLE);
     }
 
     public void goData(View view) {
@@ -72,6 +76,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         adb.setCancelable(false);
         AlertDialog ad = adb.create();
         ad.show();
+    }
+
+    public String bigNumSimplifier(float value){
+        String scientificNotation = String.format("%.4e", value);
+        String[] parts = scientificNotation.split("e");
+        double base = Double.parseDouble(parts[0]) / 10.0;
+        int exponent = Integer.parseInt(parts[1]) + 1;
+
+        return String.format("%.4f * 10^%d", base, exponent);
     }
 
     public void goHeshbonit(View view) {
@@ -97,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 String firstStr = eTFirst.getText().toString();
                 String hefreshOrMahpilStr = eTHefreshOrMahpil.getText().toString();
                 if (firstStr.isEmpty() | firstStr.equals("-") | firstStr.equals("-.") | firstStr.equals("+") | firstStr.equals("+.") | hefreshOrMahpilStr.isEmpty() | hefreshOrMahpilStr.equals("-") | hefreshOrMahpilStr.equals("-.") | hefreshOrMahpilStr.equals("+") | hefreshOrMahpilStr.equals("+."))
-                    Toast.makeText(this, "Invalid input", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Invalid input", Toast.LENGTH_SHORT).show();
                 else {
                     float x1 = Float.parseFloat(firstStr);
                     float d = Float.parseFloat(hefreshOrMahpilStr);
@@ -110,10 +123,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         } else {
                             fltLV[i] = (float) (x1 * Math.pow(d, i)); // הנדסית
                         }
-                        strLV[i] = df.format(fltLV[i]);
+
+                        // טיפול במספרים גדולים וקטנים
+                        if (fltLV[i] > 1000000 || fltLV[i] < -1000000) {
+                            strLV[i] = bigNumSimplifier(fltLV[i]);
+                        } else if (fltLV[i] > -1 && fltLV[i] < 1) {
+                            strLV[i] = String.format("%.4f", fltLV[i]);
+                        } else {
+                            strLV[i] = df.format(fltLV[i]);
+                        }
                     }
-
-
                     listView.setOnItemClickListener(MainActivity.this);
                     listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
                     listView.setAdapter(adp);
@@ -139,7 +158,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     };
 
 
-
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         int n = position + 1;
@@ -151,7 +169,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         DecimalFormat df = new DecimalFormat("#.###");
         tVn.setText("n = " + n);
-        tVSn.setText("Sn = " + df.format(Sn));
+        // טיפול במספרים גדולים וקטנים
+        if (Sn > 1000000 || Sn < -1000000) {
+            tVSn.setText("Sn = " + bigNumSimplifier(Sn));
+        } else if (Sn > -1 && Sn < 1) {
+            tVSn.setText("Sn = " + String.format("%.4f", Sn));
+        } else {
+            tVSn.setText("Sn = " + df.format(Sn));
+        }
 
         tVn.setVisibility(View.VISIBLE);
         tVSn.setVisibility(View.VISIBLE);
