@@ -1,8 +1,11 @@
 package com.example.alertdialogcalsdarot;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Layout;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -14,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -180,5 +184,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         tVn.setVisibility(View.VISIBLE);
         tVSn.setVisibility(View.VISIBLE);
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@Nullable MenuItem item) {
+        int id = item.getItemId();
+
+        if(id == R.id.menuCred) {
+            Intent si = new Intent(this, activity_credits.class);
+            startActivity(si);
+        }
+        return true;
     }
 }
